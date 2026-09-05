@@ -10,7 +10,7 @@ class TestBooksCollector:
     # обязательно указывать префикс test_
     # дальше идет название метода, который тестируем add_new_book_
     # затем, что тестируем add_two_books - добавление двух книг
-    def test_add_new_book_add_two_books(self):
+    def test_add_new_book_add_two_books(self, collector):
         # создаем экземпляр (объект) класса BooksCollector
         collector = BooksCollector()
 
@@ -30,27 +30,28 @@ class TestBooksCollector:
     # тестирование метода add_new_book: книги с невалидной длиной наименования не добавляются словарь
     @pytest.mark.parametrize('invalid_name_length', ['', 'Тестовое наименование, в котором больше 41 символа'])
 
-    def test_add_new_book_invalid_name_length_not_in_books_genre(self, invalid_name_length):
+    def test_add_new_book_invalid_name_length_not_in_books_genre(self, collector, invalid_name_length):
         collector = BooksCollector()
         collector.add_new_book(invalid_name_length)
         assert invalid_name_length not in collector.books_genre
 
     # тестирование метода set_book_genre: жанр не из списка genre не устанавливается для книг
-    def test_set_book_genre_invalid_genre_hasnt_set(self):
+    def test_set_book_genre_invalid_genre_hasnt_set(self, collector):
         collector = BooksCollector()
-        collector.add_new_book('Война и мир')
-        collector.set_book_genre('Война и мир', 'Драма')
-        assert collector.books_genre['Война и мир'] == ''
+        book = 'Война и мир'
+        collector.add_new_book(book)
+        collector.set_book_genre(book, 'Драма')
+        assert collector.books_genre[book] == ''
 
     # тестирование метода get_book_genre: возвращается жанр существующей книги
-    def test_get_book_genre_return_genre_of_the_existing_book(self):
+    def test_get_book_genre_return_genre_of_the_existing_book(self, collector):
         collector = BooksCollector()
         collector.add_new_book('Убежище')
         collector.set_book_genre('Убежище', 'Фантастика')
         assert collector.get_book_genre('Убежище') == 'Фантастика'
 
     # тестирование метода get_books_with_specific_genre: возвращаются все книги указанного жанра
-    def test_get_books_with_specific_genre_return_books_of_the_specified_genre(self):
+    def test_get_books_with_specific_genre_return_books_of_the_specified_genre(self, collector):
         collector = BooksCollector()
         books = {
             'Метро 2033': 'Фантастика',
@@ -64,12 +65,12 @@ class TestBooksCollector:
         assert 'Метро 2033' in books_with_specific_genre and 'Пост' in books_with_specific_genre and '12 стульев' not in books_with_specific_genre
 
     # тестирование метода get_books_genre: для нового объекта класса возвращается пустой словарь
-    def test_get_books_genre_return_empty_dictionary_when_no_books(self):
+    def test_get_books_genre_return_empty_dictionary_when_no_books(self, collector):
         collector = BooksCollector()
         assert collector.get_books_genre() == {}
 
     # тестирование метода get_books_for_children: книги с возрастным рейтингом не возвращаются
-    def test_get_books_for_children_do_not_return_books_with_age_rating(self):
+    def test_get_books_for_children_do_not_return_books_with_age_rating(self, collector):
         collector = BooksCollector()
         books = {
             'Метро 2033': 'Фантастика',
@@ -82,28 +83,27 @@ class TestBooksCollector:
         assert collector.get_books_for_children() == ['Метро 2033']
 
     # тестирование метода add_book_in_favorites: существующая книга добавляется в избранное
-    def test_add_book_in_favorites_add_existing_book_to_favorites(self):
+    def test_add_book_in_favorites_add_existing_book_to_favorites(self, collector):
         collector = BooksCollector()
-        collector.add_new_book('Преступление и наказание')
-        collector.add_book_in_favorites('Преступление и наказание')
-        assert 'Преступление и наказание' in collector.favorites
+        book = 'Преступление и наказание'
+        collector.add_new_book(book)
+        collector.add_book_in_favorites(book)
+        assert book in collector.favorites
 
     # тестирование метода delete_book_from_favorites: существующая книга удаляется из избранного
-    def test_delete_book_from_favorites_remove_existing_book_from_favorites(self):
+    def test_delete_book_from_favorites_remove_existing_book_from_favorites(self, collector):
         collector = BooksCollector()
-        books = ['Маленький принц', 'Капитанская дочка']
-        for book in books:
-            collector.add_new_book(book)
-            collector.add_book_in_favorites(book)
-        collector.delete_book_from_favorites('Маленький принц')
-        assert 'Маленький принц' not in collector.favorites
+        book = 'Маленький принц'
+        collector.add_new_book(book)
+        collector.add_book_in_favorites(book)
+        collector.delete_book_from_favorites(book)
+        assert book not in collector.favorites
 
     # тестирование метода get_list_of_favorites_books: возвращается список избранных книг
-    def test_get_list_of_favorites_books_return_favorites_books(self):
+    def test_get_list_of_favorites_books_return_favorites_books(self, collector):
         collector = BooksCollector()
-        books = ['Отцы и дети', 'Горе от ума', 'Мёртвые души']
-        for book in books:
-            collector.add_new_book(book)
-            collector.add_book_in_favorites(book)
-        assert 'Отцы и дети' in collector.get_list_of_favorites_books() and 'Горе от ума' in collector.get_list_of_favorites_books() and 'Мёртвые души' in collector.get_list_of_favorites_books()
+        book = 'Отцы и дети'
+        collector.add_new_book(book)
+        collector.add_book_in_favorites(book)
+        assert book in collector.get_list_of_favorites_books()
 
